@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+    <title>{% block title %}Title{% endblock %}</title>
+    <base href="http://{{ site.domain }}/">
+    <meta charset="utf-8">
+<link async rel="stylesheet" type="text/css" href="static/semantic/semantic.min.css">
+<link rel="stylesheet" type="text/css" href="static/css/base.css">
+<link rel="stylesheet" type="text/css" href="static/css/{{ streamer.full_name }}.css">
+</head>
+<body class="main body">
+{% set nav_bar_header = [
+    ('/', 'home', 'Home'),
+    ('/commands', 'commands', 'Commands'),
+    ('/decks', 'decks', 'Decks'),
+    ('/points', 'points', 'Points'),
+    ('/stats', 'stats', 'Stats'),
+] %}
+{% set nav_bar_footer = [
+    ('/contact', 'contact', 'Contact'),
+    ('/about', 'about', 'About'),
+] %}
+{% set active_page = active_page|default('home') %}
+<header class="main header">
+    <div class="ui top fixed menu">
+        {% for href, id, caption in nav_bar_header %}
+        <a class="item{% if id == active_page %} active{% endif %}" href="{{ href }}">{{ caption }}</a>
+        {% endfor %}
+
+        <div class="menu right">
+            <a class="item">
+                Login
+            </a>
+        </div>
+    </div>
+</header>
+<main class="main container">
+    {% block body %}{% endblock %}
+</main>
+<footer class="main footer">
+    <div class="ui inverted vertical footer segment center aligned">
+        <div class="ui list horizontal divided inverted">
+            {% for href, id, caption in nav_bar_footer %}
+            <a class="item{% if id == active_page %} active{% endif %}" href="{{ href }}">{{ caption }}</a>
+            {% endfor %}
+        </div>
+    </div>
+</footer>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="static/semantic/semantic.min.js"></script>
+<script async src="//cdn.pajlada.se/emote.js"></script>
+<script async src="static/scripts/autolinker.min.js"></script>
+<script src="https://ttv-api.s3.amazonaws.com/twitch.min.js"></script>
+{% block footer %}{% endblock %}
+</body>
+</html>

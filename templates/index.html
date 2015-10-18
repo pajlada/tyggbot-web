@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% set active_page = 'home' %}
+{% block title %}Home{% endblock %}
+{% block body %}
+<h3>
+This is the website for <strong>{{ bot.name }}</strong> that runs in <a href="http://twitch.tv/{{ streamer.full_name }}">{{ streamer.name }}'s</a> channel.
+</h3>
+<p>TODO: Write some more shit, describe what can be found at the links above etc</p>
+{% endblock %}

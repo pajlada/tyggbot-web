@@ -1,0 +1,23 @@
+{
+    "name": "tyggbot-web",
+    "version": "1.0.0",
+    "description": "Web interface for Tyggbot",
+    "main": "index.js",
+    "dependencies": {
+        "semantic-ui": "^2.1.4"
+    },
+    "devDependencies": {},
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/pajlada/tyggbot-web.git"
+    },
+    "author": "pajlada",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/pajlada/tyggbot-web/issues"
+    },
+    "homepage": "https://github.com/pajlada/tyggbot-web#readme"
+}

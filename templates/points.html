@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% set active_page = 'points' %}
+{% block title %}Points{% endblock %}
+{% block body %}
+<h2>Points</h2>
+<div id="top_users">
+    <table class="ui very basic table">
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Username</th>
+                <th>Points</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set rank = 1 %}
+            {% for user in top_30_users %}
+                {% include 'list/user.html' %}
+                {% set rank = rank + 1 %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

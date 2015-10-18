@@ -1,0 +1,5 @@
+.tmp.*.html
+__pycache__/
+*.ini
+node_modules
+*.log

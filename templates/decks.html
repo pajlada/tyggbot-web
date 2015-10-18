@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% set active_page = 'decks' %}
+{% block title %}Decks{% endblock %}
+{% block body %}
+<h2>Decks</h2>
+<div id="decks">
+    <table class="ui very basic table">
+        <thead>
+            <tr>
+                <th>Class</th>
+                <th>Deck</th>
+                <th>First Used</th>
+                <th>Last Used</th>
+            </tr>
+        </thead>
+        <tbody>
+{% for deck in decks %}
+{% include 'list/deck.html' %}
+{% endfor %}
+        </tbody>
+    </table>
+</div>
+<p>TODO: move decks to proper table</p>
+<p>TODO: put decks here</p>
+{% endblock %}

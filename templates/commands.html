@@ -1,0 +1,101 @@
+{% extends "layout.html" %}
+{% set active_page = 'commands' %}
+{% block title %}Commands{% endblock %}
+{% block body %}
+{% set num_aliases = 1 %}
+<h2>Commands</h2>
+<div id="commands">
+<div class="ui top attached tabular menu">
+    <a class="item active" data-tab="custom-commands">Custom Commands</a>
+    <a class="item" data-tab="point-commands">Point Commands</a>
+    <a class="item" data-tab="moderator-commands">Moderator Commands</a>
+</div>
+<div class="ui bottom attached tab segment active" data-tab="custom-commands">
+    <table class="ui very basic table">
+        <thead>
+            <tr>
+                <th>Command</th>
+                <th>Output</th>
+            </tr>
+        </thead>
+        <tbody>
+    {% for command in custom_commands %}
+    <tr>
+        <td>
+            {% for alias in command.aliases[:num_aliases] %}
+            <div class="pui command">{{ alias }}</div>
+            {% endfor %}
+        </td>
+        <td class="pemote">{{ command.output }}</td>
+    </tr>
+    {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div class="ui bottom attached tab segment" data-tab="point-commands">
+    <table class="ui very basic table">
+        <thead>
+            <tr>
+                <th>Command</th>
+                <th>Cost</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+    {% for command in point_commands %}
+    <tr>
+        <td>
+            {% for alias in command.aliases[:num_aliases] %}
+            <span class="pui command">
+                {% if command.level > 100 and command.level < 500 %}<div class="pui badge turbo"></div>{% elif command.level >= 500 and command.level < 1000 %}<div class="pui badge moderator"></div>{% elif command.level == 1000 %}<div class="pui badge broadcaster"></div>{% elif command.level > 1000 %}<div class="pui badge staff"></div>{% endif %}{{ alias }}
+            </span>
+                {% for argument in command.arguments %}
+                <span class="pui argument">{{ argument }}</span>
+                {% endfor %}
+            {% endfor %}
+        </td>
+        <td>{{ command.cost }}</td>
+        <td class="pemote">{{ command.description }}</td>
+    </tr>
+    {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div class="ui bottom attached tab segment" data-tab="moderator-commands">
+    {% set num_aliases = 1 %}
+    <table class="ui very basic table">
+        <thead>
+            <tr>
+                <th>Command</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+    {% for command in moderator_commands %}
+    <tr>
+        <td>
+            {% for alias in command.aliases[:num_aliases] %}
+            <span class="pui command">
+                {% if command.level > 100 and command.level < 500 %}<div class="pui badge turbo"></div>{% elif command.level >= 500 and command.level < 1000 %}<div class="pui badge moderator"></div>{% elif command.level == 1000 %}<div class="pui badge broadcaster"></div>{% elif command.level > 1000 %}<div class="pui badge staff"></div>{% endif %}{{ alias }}
+            </span>
+                {% for argument in command.arguments %}
+                <span class="pui argument">{{ argument }}</span>
+                {% endfor %}
+            {% endfor %}
+        </td>
+        <td class="pemote">{{ command.description }}</td>
+    </tr>
+    {% endfor %}
+        </tbody>
+    </table>
+</div>
+</div>
+{% endblock %}
+{% block footer %}
+<script type="text/javascript">
+$('#commands .menu .item')
+.tab({
+    context: $('#commands')
+});
+</script>
+{% endblock %}
