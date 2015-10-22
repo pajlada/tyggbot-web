@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-    <title>{% block title %}Title{% endblock %}</title>
+    <title>{{ streamer.name }} - {% block title %}Title{% endblock %}</title>
     <base href="http://{{ site.domain }}/">
     <meta charset="utf-8">
 <link async rel="stylesheet" type="text/css" href="static/semantic/semantic.min.css">
@@ -8,13 +8,22 @@
 <link rel="stylesheet" type="text/css" href="static/css/{{ streamer.full_name }}.css">
 </head>
 <body class="main body">
-{% set nav_bar_header = [
-    ('/', 'home', 'Home'),
-    ('/commands', 'commands', 'Commands'),
-    ('/decks', 'decks', 'Decks'),
-    ('/points', 'points', 'Points'),
-    ('/stats', 'stats', 'Stats'),
-] %}
+{% if has_decks %}
+    {% set nav_bar_header = [
+        ('/', 'home', 'Home'),
+        ('/commands', 'commands', 'Commands'),
+        ('/decks', 'decks', 'Decks'),
+        ('/points', 'points', 'Points'),
+        ('/stats', 'stats', 'Stats'),
+    ] %}
+{% else %}
+    {% set nav_bar_header = [
+        ('/', 'home', 'Home'),
+        ('/commands', 'commands', 'Commands'),
+        ('/points', 'points', 'Points'),
+        ('/stats', 'stats', 'Stats'),
+    ] %}
+{% endif %}
 {% set nav_bar_footer = [
     ('/contact', 'contact', 'Contact'),
     ('/about', 'about', 'About'),
@@ -25,12 +34,6 @@
         {% for href, id, caption in nav_bar_header %}
         <a class="item{% if id == active_page %} active{% endif %}" href="{{ href }}">{{ caption }}</a>
         {% endfor %}
-
-        <div class="menu right">
-            <a class="item">
-                Login
-            </a>
-        </div>
     </div>
 </header>
 <main class="main container">

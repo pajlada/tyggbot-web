@@ -1,13 +1,19 @@
 #!/usr/bin/env python3
 
+import markdown
 import sys
 import configparser
 import json
 import math
+import logging
 from datetime import datetime
 
-from flask import Flask, render_template
+from flask import Flask
+from flask import render_template
+from flask import Markup
 import pymysql
+
+log = logging.getLogger('test')
 
 app = Flask(__name__)
 
@@ -33,6 +39,11 @@ except pymysql.err.OperationalError as e:
     else:
         print(e)
     sys.exit(1)
+
+cursor = sqlconn.cursor()
+cursor.execute('SELECT COUNT(*) as `num_decks` FROM `tb_deck`')
+ret = cursor.fetchone()
+has_decks = ret[0] > 0
 
 
 def get_cursor():
@@ -64,38 +75,46 @@ def commands():
         for alias in command['aliases']:
             alias = '!' + alias
         if action['type'] in ['say', 'me', 'whisper']:
-            command['output'] = action['message']
+            if command['description'] is None or 'Added by' in command['description']:
+                command['description'] = action['message']
 
         command['arguments'] = []
 
         try:
-            description = json.loads(command['description'])
-            if 'description' in description:
-                command['description'] = description['description']
-            if 'usage' in description:
-                if description['usage'] == 'whisper':
-                    for x in range(0, len(command['aliases'])):
-                        alias = command['aliases'][x]
-                        command['aliases'][x] = '/w {0} {1}'.format(config['bot']['full_name'], alias)
-                    for alias in command['aliases']:
-                        command['aliases']
-                command['description'] = description['description']
-            if 'arguments' in description:
-                command['arguments'] = description['arguments']
-            if 'hidden' in description:
-                if description['hidden'] is True:
-                    continue
+            if command['description'] is not None:
+                description = json.loads(command['description'])
+                if 'description' in description:
+                    command['description'] = description['description']
+                if 'usage' in description:
+                    if description['usage'] == 'whisper':
+                        for x in range(0, len(command['aliases'])):
+                            alias = command['aliases'][x]
+                            command['aliases'][x] = '/w {0} {1}'.format(config['bot']['full_name'], alias)
+                        for alias in command['aliases']:
+                            command['aliases']
+                    command['description'] = description['description']
+                if 'arguments' in description:
+                    command['arguments'] = description['arguments']
+                if 'hidden' in description:
+                    if description['hidden'] is True:
+                        continue
+        except ValueError:
+            # Command description was not valid json
+            pass
         except:
             pass
 
-        if command['level'] > 100:
-            moderator_commands.append(command)
-        else:
-            if command['cost'] > 0:
+        if command['description']:
+            try:
+                command['description'] = Markup(markdown.markdown(command['description']))
+            except:
+                log.exception('Unhandled exception in markdown shit')
+            if command['level'] > 100:
+                moderator_commands.append(command)
+            elif command['cost'] > 0:
                 point_commands.append(command)
-            else:
-                if 'output' in command:
-                    custom_commands.append(command)
+            elif not command['description'].startswith('Added by'):
+                custom_commands.append(command)
     cursor.close()
     sqlconn.commit()
     try:
@@ -103,8 +122,8 @@ def commands():
                 custom_commands=custom_commands,
                 point_commands=point_commands,
                 moderator_commands=sorted(moderator_commands, key=lambda x: x['level']))
-    except Exception as e:
-        print(e)
+    except Exception:
+        log.exception('Unhandled exception in commands() render_template')
 
 
 @app.route('/decks')
@@ -224,7 +243,8 @@ def number_format(value, tsep=',', dsep='.'):
 default_variables = {
         'bot': dict(config['bot']),
         'site': dict(config['site']),
-        'streamer': dict(config['streamer'])
+        'streamer': dict(config['streamer']),
+        'has_decks': has_decks,
         }
 
 
