@@ -180,6 +180,11 @@ def points():
             top_30_users=top_30_users)
 
 
+@app.route('/debug')
+def debug():
+    return render_template('debug.html')
+
+
 @app.route('/stats')
 def stats():
     cursor = get_cursor()
@@ -256,12 +261,6 @@ default_variables = {
 @app.context_processor
 def inject_default_variables():
     return default_variables
-
-
-@app.after_request
-def add_header(response):
-    response.cache_control.max_age = 10
-    return response
 
 
 def time_since(t1, t2, format='long'):

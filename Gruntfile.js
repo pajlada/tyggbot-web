@@ -12,14 +12,16 @@ module.exports = function(grunt) {
             }
         },
         wget: { /* clean up unused css-stuff. you need to replace your URLs here */
-            '.tmp.index.html': 'http://dev.pajlada.se/',
-            '.tmp.commands.html': 'http://dev.pajlada.se/commands',
-            '.tmp.decks.html': 'http://dev.pajlada.se/decks',
+            '.tmp.index.html': 'http://forsen.pajlada.se/',
+            '.tmp.commands.html': 'http://forsen.pajlada.se/commands',
+            '.tmp.decks.html': 'http://forsen.pajlada.se/decks',
+            '.tmp.points.html': 'http://forsen.pajlada.se/points',
+            '.tmp.debug.html': 'http://forsen.pajlada.se/debug',
         },
         uncss: {
             dist: {
                 files: {
-                    'static/semantic/semantic.min.css': ['.tmp.index.html', '.tmp.commands.html', '.tmp.decks.html']
+                    'static/semantic/semantic.min.css': ['.tmp.index.html', '.tmp.commands.html', '.tmp.decks.html', '.tmp.points.html', '.tmp.debug.html']
                 }
             }
         }
