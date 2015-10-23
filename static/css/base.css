@@ -138,3 +138,8 @@ div.pui.class.undefined { background: url('/static/images/class_undefined_32.png
     padding-top: 50px;
     width: 100%;
 }
+
+#check_points {
+    width: 30%;
+    min-width: 300px;
+}

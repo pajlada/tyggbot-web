@@ -1,13 +1,19 @@
 #!/usr/bin/env python3
 
+import argparse
 import markdown
 import sys
+import os
 import configparser
 import json
 import math
 import logging
 from datetime import datetime
 
+from models import api
+from models import errors
+
+# from flipflop import WSGIServer
 from flask import Flask
 from flask import render_template
 from flask import Markup
@@ -16,16 +22,25 @@ import pymysql
 log = logging.getLogger('test')
 
 app = Flask(__name__)
+app._static_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
+app.register_blueprint(api.page)
 
 config = configparser.ConfigParser()
 
-if len(sys.argv) > 1:
-    res = config.read(sys.argv[1])
-else:
-    res = config.read('config.ini')
+parser = argparse.ArgumentParser(description='start the web app')
+parser.add_argument('--config', default='config.ini')
+parser.add_argument('--host', default='0.0.0.0')
+parser.add_argument('--port', type=int, default=2325)
+parser.add_argument('--debug', dest='debug', action='store_true')
+parser.add_argument('--no-debug', dest='debug', action='store_false')
+parser.set_defaults(debug=False)
+
+args = parser.parse_args()
+
+res = config.read(args.config)
 
 if len(res) == 0:
-    print('config.ini missing.')
+    print('Errors reading config file at "{0}"'.format(args.config))
     sys.exit(0)
 
 try:
@@ -45,6 +60,8 @@ cursor.execute('SELECT COUNT(*) as `num_decks` FROM `tb_deck`')
 ret = cursor.fetchone()
 has_decks = ret[0] > 0
 
+api.init(sqlconn)
+errors.init(app)
 
 def get_cursor():
     sqlconn.ping()
@@ -143,7 +160,7 @@ def decks():
 def user_profile(username):
     cursor = get_cursor()
     print(username)
-    cursor.execute('SELECT * FROM `tb_user` WHERE `username`=%s', [username])
+    cursor.execute('SELECT *, `points` as `user_points`, (SELECT COUNT(*)+1 FROM `tb_user` WHERE `points` > `user_points` ORDER BY `username` ASC) as `rank` FROM `tb_user` WHERE `username`=%s', [username])
     user = cursor.fetchone()
     if user:
         return render_template('user.html',
@@ -190,11 +207,6 @@ def discord():
     return render_template('discord.html')
 
 
-@app.errorhandler(404)
-def page_not_found(e):
-    return render_template('errors/404.html'), 404
-
-
 @app.route('/clr/overlay/<widget_id>')
 def clr_overlay(widget_id):
     print(widget_id)
@@ -203,13 +215,6 @@ def clr_overlay(widget_id):
                 widget={})
     else:
         return render_template('errors/404.html'), 404
-
-
-@app.errorhandler(Exception)
-def all_exception_handler(error):
-    print(error)
-    return 'Error', 500
-
 
 @app.template_filter()
 def number_format(value, tsep=',', dsep='.'):
@@ -293,4 +298,4 @@ def time_ago(t):
     return time_since(datetime.now().timestamp(), t.timestamp())
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=args.debug, host=args.host, port=args.port)
