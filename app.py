@@ -55,6 +55,7 @@ except pymysql.err.OperationalError as e:
         print(e)
     sys.exit(1)
 
+modules = config['site'].get('modules', '').split()
 cursor = sqlconn.cursor()
 cursor.execute('SELECT COUNT(*) as `num_decks` FROM `tb_deck`')
 ret = cursor.fetchone()
@@ -190,11 +191,20 @@ def stats():
     cursor = get_cursor()
     cursor.execute('SELECT * FROM `tb_commands` ORDER BY `num_uses` DESC LIMIT 15')
     top_5_commands = cursor.fetchall()
+
+    if 'linefarming' in modules:
+        cursor.execute('SELECT * FROM `tb_user` WHERE `username`!=%s ORDER BY `num_lines` DESC, `username` ASC LIMIT 15',
+                [config['bot']['name']])
+        top_5_line_farmers = cursor.fetchall()
+    else:
+        top_5_line_farmers = []
+
     cursor.close()
     sqlconn.commit()
 
     return render_template('stats.html',
-            top_5_commands=top_5_commands)
+            top_5_commands=top_5_commands,
+            top_5_line_farmers=top_5_line_farmers)
 
 
 @app.route('/contact')
@@ -255,6 +265,7 @@ default_variables = {
         'site': dict(config['site']),
         'streamer': dict(config['streamer']),
         'has_decks': has_decks,
+        'modules': modules,
         }
 
 
