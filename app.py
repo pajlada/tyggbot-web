@@ -163,6 +163,8 @@ def user_profile(username):
     print(username)
     cursor.execute('SELECT *, `points` as `user_points`, (SELECT COUNT(*)+1 FROM `tb_user` WHERE `points` > `user_points` ORDER BY `username` ASC) as `rank` FROM `tb_user` WHERE `username`=%s', [username])
     user = cursor.fetchone()
+    cursor.close()
+    sqlconn.commit()
     if user:
         return render_template('user.html',
                 user=user)
